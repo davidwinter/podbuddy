@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<project name="PodBuddy" basedir="." default="main">
+    <!-- Directory Variables -->
+    <property name="src.dir" value="src" />
+    <property name="build.dir" value="build" />
+	<property name="lib.dir" value="lib" />
+    <property name="classes.dir" value="${build.dir}/classes" />
+    <property name="jar.dir" value="${build.dir}/jar" />
+    
+    <property name="ROME.lib" value="${lib.dir}/rome-0.8.jar" />
+    <property name="ITUNES.lib" value="${lib.dir}/itunes-0.3.jar" />
+    <property name="JDOM.lib" value="${lib.dir}/jdom.jar" />
+    
+    <property name="libs" value="${ROME.lib}; ${ITUNES.lib}; ${JDOM.lib}" />
+    
+    <property name="main-class" value="podbuddy.PodBuddy" />
+    
+    <target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+    
+    <target name="compile">
+        <mkdir dir="${classes.dir}" />
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" 
+            classpath="${libs}" />
+    </target>
+    
+    <target name="jar" depends="compile">
+        <unjar src="${ROME.lib}" dest="${classes.dir}" />
+        <unjar src="${ITUNES.lib}" dest="${classes.dir}" />
+        <unjar src="${JDOM.lib}" dest="${classes.dir}" />
+        
+        <delete dir="${classes.dir}/META-INF" />
+        
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}" />
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="run" depends="jar">
+        <java jar="${jar.dir}/${ant.project.name}.jar" fork="true" />
+    </target>
+    
+    <target name="clean-build" depends="clean, jar" />
+    
+    <target name="main" depends="clean, run" />
+</project>
